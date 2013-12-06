@@ -3,6 +3,8 @@ OpenNI2-Kinect2Driver
 
 OpenNI2 Kinect v2 DevPrev Driver
 
+![OpenNI2-Kinect2Driver](https://pbs.twimg.com/media/BazF6FECcAA-P4V.png:large)
+
 ## Requirements
 
  * Visual Studio 2012
