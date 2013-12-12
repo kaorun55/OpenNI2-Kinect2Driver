@@ -25,7 +25,14 @@ OpenNI2 Kinect v2 DevPrev Driver
 
 ## Installation
 
-1. fork & clone [OpenNI2 v2.2.0.33](https://github.com/OpenNI/OpenNI2)(commit 7bef8f639e).
+1. Install [OpenNI 2.2.0.33 Beta(x64)](http://www.openni.org/openni-sdk/)
+2. Download or Clone project.
+3. Move "Bin" folder to "C:\Program Files\OpenNI2\Samples"
+
+
+## Build
+
+1. fork & clone [OpenNI2 v2.2.0.33 Source](https://github.com/OpenNI/OpenNI2)(commit 7bef8f639e).
 2. Open Visual Studio 2012.
 3. Update Toolkit v110.
 4. Move Kinect2 folder to "OpenNI2\Source\Drivers".
