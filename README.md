@@ -1,7 +1,7 @@
 OpenNI2-Kinect2Driver
 =====================
 
-OpenNI2 Kinect v2 DevPrev Driver
+OpenNI2 Kinect v2 Driver
 
 ![OpenNI2-Kinect2Driver](https://pbs.twimg.com/media/BazF6FECcAA-P4V.png:large)
 
@@ -10,11 +10,6 @@ OpenNI2 Kinect v2 DevPrev Driver
 * Please use at your own risk
 * Still in the experimental stage. It just runs, but may have a lack of features or may be buggy.
 * Does not run with NiTE. NiTE requires proprietary driver parameters that we cannot implement. 
-
-## Important
-
-* This is preliminary software and/or hardware and APIs are preliminary and subject to change.
-* ソフトウェアやハードウェア、APIは暫定的なものであり正式版では変更される可能性があります。
 
 
 ## Installation
@@ -25,8 +20,8 @@ OpenNI2 Kinect v2 DevPrev Driver
 
 ### Requirements
 
- * Kinect for Windows v2 Developer Preview
- * Kinect for Windows SDK v2 Developer Preview 1311
+ * Kinect for Windows v2
+ * Kinect for Windows SDK v2 1409
  * [OpenNI 2.2.0.33 Beta(x64)](http://www.openni.org/openni-sdk/)
 
 
@@ -46,7 +41,7 @@ OpenNI2 Kinect v2 DevPrev Driver
 
 ### Requirements
 
- * Kinect for Windows v2 Developer Preview
- * Kinect for Windows SDK v2 Developer Preview 1311
+ * Kinect for Windows v2 
+ * Kinect for Windows SDK v2 1409
  * [OpenNI2 v2.2.0.33 Source](https://github.com/OpenNI/OpenNI2)
- * Visual Studio 2012
+ * Visual Studio 2012 or later
