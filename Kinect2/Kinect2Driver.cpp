@@ -43,6 +43,12 @@ public:
 	virtual OniStatus SetVideoMode(OniVideoMode*) = 0;
 	virtual OniStatus GetVideoMode(OniVideoMode* pVideoMode) = 0;
 
+    virtual OniStatus GetHorizontalFov( float* pValue ) = 0;
+    virtual OniStatus GetVerticalFov( float* pValue ) = 0;
+    virtual OniStatus GetStride( int* pValue ) = 0;
+    virtual OniStatus GetMaxValue( int* pValue ){ return ONI_STATUS_NOT_IMPLEMENTED; }
+    virtual OniStatus GetMinValue( int* pValue ){ return ONI_STATUS_NOT_IMPLEMENTED; }
+
 	OniStatus getProperty(int propertyId, void* data, int* pDataSize)
 	{
 		if (propertyId == ONI_STREAM_PROPERTY_VIDEO_MODE)
@@ -52,10 +58,56 @@ public:
 				printf("Unexpected size: %d != %d\n", *pDataSize, (int)sizeof(OniVideoMode));
 				return ONI_STATUS_ERROR;
 			}
+
 			return GetVideoMode((OniVideoMode*)data);
 		}
+        else if ( propertyId == ONI_STREAM_PROPERTY_HORIZONTAL_FOV ){
+            if ( *pDataSize != sizeof( float ) )
+            {
+                printf( "Unexpected size: %d != %d\n", *pDataSize, (int)sizeof( float ) );
+                return ONI_STATUS_ERROR;
+            }
 
-		return ONI_STATUS_NOT_IMPLEMENTED;
+            return GetHorizontalFov( (float*)data );
+        }
+        else if ( propertyId == ONI_STREAM_PROPERTY_VERTICAL_FOV ){
+            if ( *pDataSize != sizeof( float ) )
+            {
+                printf( "Unexpected size: %d != %d\n", *pDataSize, (int)sizeof( float ) );
+                return ONI_STATUS_ERROR;
+            }
+
+            return GetVerticalFov( (float*)data );
+        }
+        else if ( propertyId == ONI_STREAM_PROPERTY_STRIDE ){
+            if ( *pDataSize != sizeof( int ) )
+            {
+                printf( "Unexpected size: %d != %d\n", *pDataSize, (int)sizeof( int ) );
+                return ONI_STATUS_ERROR;
+            }
+
+            return GetStride( (int*)data );
+        }
+        else if ( propertyId == ONI_STREAM_PROPERTY_MAX_VALUE ){
+            if ( *pDataSize != sizeof( float ) )
+            {
+                printf( "Unexpected size: %d != %d\n", *pDataSize, (int)sizeof( float ) );
+                return ONI_STATUS_ERROR;
+            }
+
+            return GetVerticalFov( (float*)data );
+        }
+        else if ( propertyId == ONI_STREAM_PROPERTY_MIN_VALUE ){
+            if ( *pDataSize != sizeof( float ) )
+            {
+                printf( "Unexpected size: %d != %d\n", *pDataSize, (int)sizeof( float ) );
+                return ONI_STATUS_ERROR;
+            }
+
+            return GetVerticalFov( (float*)data );
+        }
+		
+        return ONI_STATUS_NOT_IMPLEMENTED;
 	}
 
 	OniStatus setProperty(int propertyId, const void* data, int dataSize)
@@ -146,6 +198,25 @@ public:
 		return ONI_STATUS_OK;
 	}
 
+    OniStatus GetHorizontalFov( float* pValue )
+    {
+        *pValue = horizontalFieldOfView;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetVerticalFov( float* pValue )
+    {
+        *pValue = verticalFieldOfView;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetStride( int* pValue )
+    {
+        *pValue = stride;
+        return ONI_STATUS_OK;
+    }
+
+
 	virtual int GetBytesPerPixel() { return sizeof(OniRGB888Pixel); }
 
 	void Mainloop()
@@ -184,7 +255,21 @@ private:
         }
 
         colorRGBX_.resize( COLOR_WIDTH * COLOR_HEIGHT );
-	}
+
+        CComPtr<IFrameDescription> frameDescription;
+        hr = colorFrameSource->CreateFrameDescription( COLOR_FORMAT, &frameDescription );
+        if ( FAILED( hr ) ) {
+            std::cerr << "IColorFrameSource::get_FrameDescription() failed." << std::endl;
+            return;
+        }
+
+        frameDescription->get_HorizontalFieldOfView( &horizontalFieldOfView );
+        frameDescription->get_VerticalFieldOfView( &verticalFieldOfView );
+
+        int width;
+        frameDescription->get_Width( &width );
+        stride = width * GetBytesPerPixel();
+    }
 
 	virtual int BuildFrame(OniFrame* pFrame)
 	{
@@ -232,7 +317,7 @@ private:
         }
 
         hr = colorFrame->CopyConvertedFrameDataToArray(colorRGBX_.size() * sizeof(RGBQUAD),
-                        reinterpret_cast<BYTE*>(&colorRGBX_[0]), ColorImageFormat_Bgra);            
+            reinterpret_cast<BYTE*>(&colorRGBX_[0]), COLOR_FORMAT );
         if (FAILED(hr)) {
             return false;
         }
@@ -245,8 +330,13 @@ private:
 
     CComPtr<IKinectSensor>          kinect_;
     CComPtr<IColorFrameReader>      colorFrameReader_;
+    float horizontalFieldOfView;
+    float verticalFieldOfView;
+    int stride;
 
     std::vector<RGBQUAD> colorRGBX_;
+
+    const ColorImageFormat COLOR_FORMAT = ColorImageFormat::ColorImageFormat_Bgra;
 };
 
 
@@ -273,6 +363,36 @@ public:
 		pVideoMode->resolutionY = DEPTH_HEIGHT;
 		return ONI_STATUS_OK;
 	}
+
+    OniStatus GetHorizontalFov( float* pValue )
+    {
+        *pValue = horizontalFieldOfView;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetVerticalFov( float* pValue )
+    {
+        *pValue = verticalFieldOfView;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetStride( int* pValue )
+    {
+        *pValue = stride;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetMaxValue( int* pValue )
+    {
+        *pValue = depthMaxValue;
+        return ONI_STATUS_OK;
+    }
+
+    OniStatus GetMinValue( int* pValue )
+    {
+        *pValue = depthMinValue;
+        return ONI_STATUS_OK;
+    }
 
 	virtual int GetBytesPerPixel() { return sizeof(OniDepthPixel); }
 
@@ -304,7 +424,25 @@ private:
             std::cerr << "IDepthFrameSource::OpenReader() failed." << std::endl;
             return;
         }
-	}
+
+        CComPtr<IFrameDescription> frameDescription;
+        hr = depthFrameSource->get_FrameDescription( &frameDescription );
+        if ( FAILED( hr ) ) {
+            std::cerr << "IDepthFrameSource::get_FrameDescription() failed." << std::endl;
+            return;
+        }
+
+        frameDescription->get_HorizontalFieldOfView( &horizontalFieldOfView );
+        frameDescription->get_VerticalFieldOfView( &verticalFieldOfView );
+
+        int width;
+        frameDescription->get_Width( &width );
+        stride = width * GetBytesPerPixel();
+
+
+        depthFrameSource->get_DepthMaxReliableDistance( &depthMaxValue );
+        depthFrameSource->get_DepthMinReliableDistance( &depthMinValue );
+    }
 
 	virtual int BuildFrame(OniFrame* pFrame)
 	{
@@ -365,6 +503,12 @@ private:
 
     CComPtr<IKinectSensor>          kinect_;
     CComPtr<IDepthFrameReader>      depthFrameReader_;
+
+    float horizontalFieldOfView;
+    float verticalFieldOfView;
+    int stride;
+    UINT16 depthMinValue;
+    UINT16 depthMaxValue;
 
     std::vector<UINT16> depthBuffer_;
 
@@ -496,8 +640,8 @@ public:
 		// Create device info
 		OniDeviceInfo* pInfo = XN_NEW(OniDeviceInfo);
 		xnOSStrCopy(pInfo->vendor, "Microsoft", ONI_MAX_STR);
-		xnOSStrCopy(pInfo->name, "Kinect V2 Developer Preview", ONI_MAX_STR);
-		xnOSStrCopy(pInfo->uri, "Kinect V2", ONI_MAX_STR);
+		xnOSStrCopy(pInfo->name, "Kinect for Windows v2", ONI_MAX_STR);
+		xnOSStrCopy(pInfo->uri, "Kinect for Windows v2", ONI_MAX_STR);
 
 		// internal connect device
 		deviceConnected(pInfo);
