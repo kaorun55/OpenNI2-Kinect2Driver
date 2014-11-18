@@ -225,10 +225,11 @@ public:
 
 		while (m_running)
 		{
-			OniFrame* pFrame = getServices().acquireFrame();
-			BuildFrame(pFrame);
-			raiseNewFrame(pFrame);
-		}
+            OniFrame* pFrame = getServices().acquireFrame();
+            BuildFrame(pFrame);
+            raiseNewFrame(pFrame);
+            getServices().releaseFrame( pFrame );
+        }
     }
 
 private:
@@ -322,6 +323,7 @@ private:
             return false;
         }
 
+
         return true;
     }
 
@@ -403,9 +405,10 @@ public:
 		while (m_running)
 		{
             OniFrame* pFrame = getServices().acquireFrame();
-			BuildFrame(pFrame);
-			raiseNewFrame(pFrame);
-		}
+            BuildFrame(pFrame);
+            raiseNewFrame(pFrame);
+            getServices().releaseFrame( pFrame );
+        }
     }
 
 private:
@@ -623,18 +626,14 @@ public:
 		oni::driver::DeviceStateChangedCallback deviceStateChangedCallback,
 		void* pCookie)
 	{
+        ::OutputDebugStringA( "Initialize Kinect\n" );
+
 		oni::driver::DriverBase::initialize(connectedCallback, disconnectedCallback, deviceStateChangedCallback, pCookie);
 
         // Open Kinect v2
         auto hr = ::GetDefaultKinectSensor( &kinect_ );
         if ( FAILED( hr ) ) {
 			return ONI_STATUS_NO_DEVICE;
-        }
-        
-        hr = kinect_->Open();
-        if (FAILED(hr)) {
-            std::cerr << "IKinectSensor::Open() failed." << std::endl;
-			return ONI_STATUS_ERROR;
         }
 
 		// Create device info
@@ -656,7 +655,15 @@ public:
             return 0;
         }
 
-		return XN_NEW(KinectV2Device, getServices(), kinect_);
+        ::OutputDebugStringA( "Open Kinect\n" );
+
+        auto hr = kinect_->Open();
+        if ( FAILED( hr ) ) {
+            std::cerr << "IKinectSensor::Open() failed." << std::endl;
+            return 0;
+        }
+
+        return XN_NEW( KinectV2Device, getServices(), kinect_ );
 	}
 
 	virtual void deviceClose(oni::driver::DeviceBase* pDevice)
