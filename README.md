@@ -14,20 +14,21 @@ OpenNI2 Kinect v2 Driver
 
 ## Installation
 
-1. Install [OpenNI 2.2.0.33 Beta(x64)](http://www.openni.org/openni-sdk/)
+1. Install [OpenNI 2.2.0.33 Beta(x64)](http://structure.io/openni)
 2. Download or Clone project.
-3. Move "Bin" folder to "C:\Program Files\OpenNI2\Samples"
+3. Move "Bin" folder to "C:\Program Files\OpenNI2\Tools"
+4. Start C:\Program Files\OpenNI2\Tools\NiViewer.exe
 
 ### Requirements
 
  * Kinect for Windows v2
  * Kinect for Windows SDK v2 1409
- * [OpenNI 2.2.0.33 Beta(x64)](http://www.openni.org/openni-sdk/)
+ * [OpenNI 2.2.0.33 Beta(x64)](http://structure.io/openni)
 
 
 ## Build
 
-1. fork & clone [OpenNI2 v2.2.0.33 Source](https://github.com/OpenNI/OpenNI2)(commit 7bef8f639e).
+1. fork & clone [OpenNI2 v2.2.0.33 Source](https://github.com/occipital/openni2).
 2. Open Visual Studio 2012.
 3. Update Toolkit v110.
 4. Move Kinect2 folder to "OpenNI2\Source\Drivers".
@@ -43,5 +44,5 @@ OpenNI2 Kinect v2 Driver
 
  * Kinect for Windows v2 
  * Kinect for Windows SDK v2 1409
- * [OpenNI2 v2.2.0.33 Source](https://github.com/OpenNI/OpenNI2)
+ * [OpenNI2 v2.2.0.33 Source](https://github.com/occipital/openni2)
  * Visual Studio 2012 or later
